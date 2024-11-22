@@ -4,22 +4,36 @@ codigo_fuente = open("codigoFuente.txt", "r")
 codigo_resultado = open("codigoResultado.txt", "w")
 
 nombreValido = r"[A-Za-z_][A-Za-z0-9_]*"
-
 finalizado = r".*?(?=;)"
+isInt = r"[0-9]*"
+endWithComa = r".*?(?=,)"
 
 try:
     codigo = codigo_fuente.read()
-    print(len(codigo))
     palabras = codigo.split() #creo que va a ser mejor hacer todo con expresiones regulares en vez de separar palabras
-    for i in range(0, len(palabras)):
-        if palabras[i] == "int":
-            if re.match(nombreValido, palabras[i+1]):
-                linea = f"{palabras[i+1]}: word."
-                if palabras[i+2] == "=":
-                    n = 3;
-                    #while (not(re.match(finalizado, palabras[i+n]))):
-                        #linea += f" {palabras[i+n]}"
-                        #n += 1
+
+    linea = 0
+    i = 0
+    while i < len(palabras):
+        if re.match(r"int", palabras[i]):
+            i += 1
+            if re.match(nombreValido, palabras[i]):
+                linea = f"{palabras[i]}: word."
+                i += 1
+                if re.match(r"=", palabras[i]):
+                    i += 1
+                    while not(re.match(finalizado, palabras[i])) and re.match(endWithComa, palabras[i]):
+                        palabras[i] = palabras[i].replace(",", "")
+                        if re.match(isInt, palabras[i]):
+                            linea += f" {palabras[i]}"
+                        palabras[i] = palabras[i].replace(";", "")
+                        i += 1
+                    if re.match(isInt, palabras[i]):
+                        if re.match(isInt, palabras[i]):
+                            linea += f" {palabras[i]}"
+        linea += 1
+        codigo_resultado = f"{linea}\n"
+                            
 
     print(linea)
 finally:
