@@ -7,6 +7,7 @@ nombreValido = r"[A-Za-z_][A-Za-z0-9_]*"
 finalizado = r".*?(?=;)"
 isInt = r"[0-9]*"
 endWithComa = r".*?(?=,)"
+isChar = r'"(.*?)(?=")'
 
 try:
     codigo = codigo_fuente.read()
@@ -32,9 +33,37 @@ try:
                         if re.match(isInt, palabras[i]):
                             palabras[i] = palabras[i].replace(";", "")
                             linea += f" {palabras[i]}"
+
+        elif re.match(r"char", palabras[i]):
+            i += 1
+            if re.match(nombreValido, palabras[i]):
+                nombreDeVariable = palabras[i]
+                i += 1
+                isString = False
+                if re.match(r"=", palabras[i]):
+                    i += 1
+                    while not(re.match(finalizado, palabras[i])) and re.match(endWithComa, palabras[i]):
+                        if isString:
+                            linea = f"{nombresDeVariable}: asciiz."
+                        isString = True
+                        palabras[i] = palabras[i].replace(",", "")
+                        if re.match(isChar, palabras[i]):
+                            linea += f" {palabras[i]}"
+                        
+                        i += 1
+                    if re.match(isInt, palabras[i]):
+                        if re.match(isChar, palabras[i]):
+                            palabras[i] = palabras[i].replace(";", "")
+                            if isString:
+                                linea += f" {palabras[i]}"
+                            else:
+                                palabras[i] = palabras[i].replace('"', "")
+                                linea = f"{nombreDeVariable}: byte. '{palabras[i]}'"
+
         i += 1
         numeroDeLinea += 1
         codigo_resultado.write(f"{linea}\n")
+        
 
 finally:
     codigo_fuente.close()
